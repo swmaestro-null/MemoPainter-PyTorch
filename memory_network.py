@@ -11,7 +11,7 @@ class Memory_Network(nn.Module):
     def __init__(self, mem_size, color_info, color_feat_dim = 313, spatial_feat_dim = 512, top_k = 256, alpha = 0.1, age_noise = 4.0):
         
         super(Memory_Network, self).__init__()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
         self.ResNet18 = ResNet18().to(self.device)
         self.ResNet18 = self.ResNet18.eval()
         self.mem_size = mem_size
@@ -108,7 +108,7 @@ class Memory_Network(nn.Module):
         self.age[case_index] = 0.0
         
         ## Case 2
-        memory_mask = 1.0 - memory_mask
+        memory_mask = ~ memory_mask
         case_index = top1_index[memory_mask]
         
         random_noise = random_uniform((self.mem_size, 1), -self.age_noise, self.age_noise)[:, 0]

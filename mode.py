@@ -1,5 +1,6 @@
 import os
 import torch
+from torch.cuda.memory import empty_cache
 import torch.nn as nn
 from dataset import mydata
 from torch.utils.data import DataLoader
@@ -26,7 +27,8 @@ def train(args):
     f.close()
     
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu") ## cuda로 돌리니까 메모리 초과나고 꺼져서 실패..ㅠㅠㅠ RuntimeError: CUDA out of memory.
     
     ### Dataset and Dataloader for training
     tr_dataset = mydata(img_path = args.train_data_path, img_size = args.img_size, km_file_path = args.km_file_path, color_info = args.color_info)
@@ -105,6 +107,9 @@ def train(args):
             zero_grad(opts)
             g_loss.backward()
             g_opt.step()
+
+            ##학습 데이터 삭제
+            #torch.cuda.empty_cache()
             
         f = open(train_log_path, 'a')
         f.write('%04d-epoch train loss'%(e))
@@ -127,7 +132,8 @@ def train(args):
 
 def test(args):
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
     
     ### Dataset and Dataloader for test
     test_dataset = mydata(img_path = args.test_data_path, img_size = args.img_size, km_file_path = args.km_file_path, color_info = args.color_info)
